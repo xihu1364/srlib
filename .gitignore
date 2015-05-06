@@ -14,6 +14,20 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
+# windows c++ tmp files
+*.sdf
+*.tlog
+*.obj
+*.log
+*.pch
+*.ipch
+*.idb
+*.opensdf
+*.suo
+*.unsuccessfulbuild
+*.lastbuildstate
+
+
 # Windows shortcuts
 *.lnk
 
