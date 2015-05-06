@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="srlib">
+      <UniqueIdentifier>{73e7db7a-cbd4-46c0-b2db-521e7414d645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="srlib\zlib">
+      <UniqueIdentifier>{f3b7115f-4b78-4a87-9a62-f99240b95ad9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="srlib\net">
+      <UniqueIdentifier>{72bf5372-6f7c-4303-93cf-67e957d1ce83}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\ClassFactory.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\crc32.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\Ini.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\Lock.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\MemoryPool.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\ringqueue.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\Singleton.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\syndeque.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\SysLog.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\threadpool.h">
+      <Filter>srlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\net\ClientItem.h">
+      <Filter>srlib\net</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\net\IocpDriver.h">
+      <Filter>srlib\net</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\net\IoManager.h">
+      <Filter>srlib\net</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\net\NetDefine.h">
+      <Filter>srlib\net</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\net\NetItem.h">
+      <Filter>srlib\net</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\net\ServerItem.h">
+      <Filter>srlib\net</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\zlib\zconf.h">
+      <Filter>srlib\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="srlib\zlib\zlib.h">
+      <Filter>srlib\zlib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib\ClassFactory.cpp">
+      <Filter>srlib</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib\Ini.cpp">
+      <Filter>srlib</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib\Lock.cpp">
+      <Filter>srlib</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib\SysLog.cpp">
+      <Filter>srlib</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib\net\ClientItem.cpp">
+      <Filter>srlib\net</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib\net\IocpDriver.cpp">
+      <Filter>srlib\net</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib\net\IoManager.cpp">
+      <Filter>srlib\net</Filter>
+    </ClCompile>
+    <ClCompile Include="srlib\net\ServerItem.cpp">
+      <Filter>srlib\net</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="srlib\zlib\zlib.lib">
+      <Filter>srlib\zlib</Filter>
+    </Library>
+    <Library Include="srlib\zlib\zlib_d.lib">
+      <Filter>srlib\zlib</Filter>
+    </Library>
+  </ItemGroup>
+</Project>
