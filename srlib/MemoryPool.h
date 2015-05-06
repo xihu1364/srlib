@@ -9,40 +9,68 @@
 #define __MEMPOOL_H__
 
 #include <assert.h>
-#include <afx.h>
-#include <cmath>
 #include "Singleton.h"
 
+enum AllocatorIdx
+{
+	Mem_Block_Base        = 4,
 
-using namespace std;
+	Allocator_Idx_Invalid = -1,
+	Allocator_Idx_0       = 0,      // 1 << (0+Mem_Block_Base)    // 16,
+	Allocator_Idx_1       = 1,      // 1 << (1+Mem_Block_Base)    // 32,
+	Allocator_Idx_2       = 2,      // 1 << (2+Mem_Block_Base)    // 64,
+	Allocator_Idx_3       = 3,      // 1 << (3+Mem_Block_Base)    // 128,
+	Allocator_Idx_4       = 4,      // 1 << (4+Mem_Block_Base)    // 256,
+	Allocator_Idx_5       = 5,      // 1 << (5+Mem_Block_Base)    // 512,
+	Allocator_Idx_6       = 6,      // 1 << (6+Mem_Block_Base)    // 1k,
+	Allocator_Idx_7       = 7,      // 1 << (7+Mem_Block_Base)    // 2k,
+	Allocator_Idx_8       = 8,      // 1 << (8+Mem_Block_Base)    // 4k,
+	Allocator_Idx_9       = 9,      // 1 << (9+Mem_Block_Base)    // 8k,
+	Allocator_Idx_10      = 10,     // 1 << (10+Mem_Block_Base)   // 16k,
+	Allocator_Idx_11      = 11,     // 1 << (11+Mem_Block_Base)   // 32k,
+	Allocator_Idx_12      = 12,     // 1 << (12+Mem_Block_Base)   // 64k,
+	Allocator_Idx_13      = 13,     // 1 << (13+Mem_Block_Base)   // 128k,
+	Allocator_Idx_14      = 14,     // 1 << (14+Mem_Block_Base)   // 256k,
+	Allocator_Idx_15      = 15,     // 1 << (15+Mem_Block_Base)   // 512k,
+	Allocator_Idx_16      = 16,     // 1 << (16+Mem_Block_Base)   // 1m,
+	Allocator_Idx_17      = 17,     // 1 << (17+Mem_Block_Base)   // 2m,
+	Allocator_Idx_18      = 18,     // 1 << (18+Mem_Block_Base)   // 4m,
+
+	Allocator_Idx_Max,
+};
 
 enum MemType
 {
-	Mem_0_Bit_Size		= 0,
-	Mem_16_Bit_Size		= 16,
-	Mem_32_Bit_Size		= 32,
-	Mem_64_Bit_Size		= 64,
-	Mem_128_Bit_Size	= 128,
-	Mem_256_Bit_Size	= 256,
-	Mem_512_Bit_Size	= 512,
-	Mem_1k_Bit_Size		= 1024,	
-	Mem_2k_Bit_Size		= 2*1024,
-	Mem_4k_Bit_Size		= 4*1024,
-	Mem_8k_Bit_Size		= 8*1024,
-	Mem_16k_Bit_Size	= 16*1024,	
-	Mem_32k_Bit_Size	= 32*1024,							
-	Mem_64k_Bit_Size	= 64*1024,							
-	Mem_128k_Bit_Size	= 128*1024,							
-	Mem_256k_Bit_Size	= 256*1024,	
-	Mem_512k_Bit_Size	= 512*1024,	
-	Mem_1m_Bit_Size		= 1024*1024,
-};
+	Mem_User_Byte_Size_Type = -1,   // 0xFFFFFFFF,
 
+	Mem_16_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_0),       // 16,
+	Mem_32_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_1),       // 32,
+	Mem_64_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_2),       // 64,
+	Mem_128_Byte_Size_Type  = 1 << (Mem_Block_Base + Allocator_Idx_3),       // 128,
+	Mem_256_Byte_Size_Type  = 1 << (Mem_Block_Base + Allocator_Idx_4),       // 256,
+	Mem_512_Byte_Size_Type  = 1 << (Mem_Block_Base + Allocator_Idx_5),       // 512,
+	Mem_1k_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_6),       // 1k,
+	Mem_2k_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_7),       // 2k,
+	Mem_4k_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_8),       // 4k,
+	Mem_8k_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_9),       // 8k,
+	Mem_16k_Byte_Size_Type  = 1 << (Mem_Block_Base + Allocator_Idx_10),      // 16k,
+	Mem_32k_Byte_Size_Type  = 1 << (Mem_Block_Base + Allocator_Idx_11),      // 32k,
+	Mem_64k_Byte_Size_Type  = 1 << (Mem_Block_Base + Allocator_Idx_12),      // 64k,
+	Mem_128k_Byte_Size_Type = 1 << (Mem_Block_Base + Allocator_Idx_13),      // 128k,
+	Mem_256k_Byte_Size_Type = 1 << (Mem_Block_Base + Allocator_Idx_14),      // 256k,
+	Mem_512k_Byte_Size_Type = 1 << (Mem_Block_Base + Allocator_Idx_15),      // 512k,
+	Mem_1m_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_16),      // 1m,
+	Mem_2m_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_17),      // 2m,
+	Mem_4m_Byte_Size_Type   = 1 << (Mem_Block_Base + Allocator_Idx_18),      // 4m,
+
+	Mem_Min_Byte_Size_Type  = Mem_16_Byte_Size_Type,
+	Mem_Max_Byte_Size_Type  = Mem_4m_Byte_Size_Type,
+};
 
 struct MemBlock
 {
-	MemBlock(int nMenLen) : m_nMemLen(nMenLen),m_pPreBlock(NULL),m_pNextBlock(NULL){}
-	int			m_nMemLen;
+	explicit MemBlock(int nBlockSize) : m_nBlockSizeType(nBlockSize),m_pPreBlock(NULL),m_pNextBlock(NULL){}
+	int         m_nBlockSizeType;  // refer MemType
 	MemBlock*	m_pPreBlock;
 	MemBlock*	m_pNextBlock;
 };
@@ -50,22 +78,24 @@ struct MemBlock
 class MemTypeAllocator
 {
 public:
-	MemTypeAllocator(int nBlockType): m_nBlockType(nBlockType),m_nTotalBlockNum(0),m_nFreeBlockNum(0),m_pBeginBlock(NULL),m_pEndBlock(NULL){};
-	~MemTypeAllocator(){};
+	explicit MemTypeAllocator(int nAllocBound);
+	~MemTypeAllocator();
 	void* AllocMemory();
 	void FreeMemory(void* pFreeMemory);
 	int GetTotalBlockCount();
 	int GetFreeBlockCount();
-	int GetBlockType();
+	int GetBlockBound();
 	void DumpNode();
 private:
-	static const int BlockMax = 100;
-	int			m_nBlockType;
-	long		m_nTotalBlockNum;
-	long		m_nFreeBlockNum;
-	MemBlock*	m_pBeginBlock;
-	MemBlock*	m_pEndBlock;
+	// max free block count
+	enum eMaxFreeSlots{ MaxFreeSlots = 20, };
+	size_t     m_nBlockBound;        // allocate boundary [16B 32B ... 4MB]
+	long       m_nTotalBlockNum;     // total block number
+	long       m_nFreeBlockNum;      // available block number
+	MemBlock*  m_pBeginBlock;
+	MemBlock*  m_pEndBlock;
 };
+
 /************************************************************************
 * Function : NA
 * Author   : xihu
@@ -77,7 +107,7 @@ inline void* MemTypeAllocator::AllocMemory()
 {
 	void* pRet = NULL;
 
-	if (m_pEndBlock != NULL)
+	if ( NULL != m_pEndBlock )
 	{
 		assert(m_pEndBlock->m_pNextBlock == NULL);
 
@@ -97,17 +127,17 @@ inline void* MemTypeAllocator::AllocMemory()
 		}
 		pTond->m_pPreBlock = NULL;
 
-		m_nFreeBlockNum--;
+		--m_nFreeBlockNum;
 	}
 	else
 	{
-		void* pMemory = malloc(m_nBlockType + sizeof(MemBlock));
+		void* pMemory = malloc(m_nBlockBound + sizeof(MemBlock));
 
 		MemBlock* pNewBlock = (MemBlock*)pMemory;
 
 		assert(pNewBlock != NULL);
 
-		pNewBlock->m_nMemLen = m_nBlockType;
+		pNewBlock->m_nBlockSizeType = m_nBlockBound;
 
 		pNewBlock->m_pNextBlock = NULL;
 
@@ -115,7 +145,7 @@ inline void* MemTypeAllocator::AllocMemory()
 
 		pRet = (char*)pNewBlock + sizeof(MemBlock);
 
-		m_nTotalBlockNum++;
+		++m_nTotalBlockNum;
 	}
 	return pRet;
 }
@@ -128,23 +158,21 @@ inline void* MemTypeAllocator::AllocMemory()
 ************************************************************************/
 inline void MemTypeAllocator::FreeMemory(void* pFreeMemory)
 {
-	assert(pFreeMemory != NULL);
-
-	if (pFreeMemory == NULL)
+	if (NULL == pFreeMemory)
 	{
+		assert(!(NULL == pFreeMemory));
 		return; 
 	}
+
 	MemBlock* pMemBlock = (MemBlock*)((char*)pFreeMemory - sizeof(MemBlock));
 
-	memset(pFreeMemory,0,pMemBlock->m_nMemLen);
-
-	if (m_nFreeBlockNum > BlockMax)
+	if (m_nFreeBlockNum > MaxFreeSlots)
 	{
 		free(pMemBlock);
 
 		pMemBlock = NULL;
 
-		m_nTotalBlockNum--;
+		--m_nTotalBlockNum;
 	}
 	else
 	{
@@ -156,13 +184,15 @@ inline void MemTypeAllocator::FreeMemory(void* pFreeMemory)
 		}
 		else
 		{
+			assert(NULL == m_pBeginBlock->m_pPreBlock);
+
 			pMemBlock->m_pNextBlock = m_pBeginBlock;
 
 			m_pBeginBlock->m_pPreBlock = pMemBlock;
 
 			m_pBeginBlock = pMemBlock;
 		}
-		m_nFreeBlockNum++;
+		++m_nFreeBlockNum;
 	}
 }
 /************************************************************************
@@ -194,9 +224,9 @@ inline int MemTypeAllocator::GetFreeBlockCount()
 * Output   : 
 * Info     : 2014/04/03
 ************************************************************************/
-inline int MemTypeAllocator::GetBlockType()
+inline int MemTypeAllocator::GetBlockBound()
 {
-	return m_nBlockType;
+	return m_nBlockBound;
 }
 /************************************************************************
 * Function : NA
@@ -217,13 +247,13 @@ inline void MemTypeAllocator::DumpNode()
 	}
 	//TRACE("NULL\n");
 
-	printf("BlockType : %d TotalBlockNum : %d FreeBlockNum : %d  UserBlockNum : %d \n",m_nBlockType,m_nTotalBlockNum,m_nFreeBlockNum,m_nTotalBlockNum - m_nFreeBlockNum);
+	printf("BlockType : %d TotalBlockNum : %d FreeBlockNum : %d  UserBlockNum : %d \n",m_nBlockBound,m_nTotalBlockNum,m_nFreeBlockNum,m_nTotalBlockNum - m_nFreeBlockNum);
 }
 
 class MemoryPool
 {
 public:
-	~MemoryPool(){};
+	~MemoryPool(){ }
 
 	void InitMemoryPool();
 	void UnInitMemoryPool();
@@ -231,38 +261,41 @@ public:
 	void* Malloc(int nSize);
 	void Free(void* pMemory);
 
+	template<class T> T* New();
+	template<class T> void Delete(T* pObj);
+
 	long GetTotalMemorySize();
 	long GetFreeMemorySize();
 
-	int GetTotalBlockCountForType(int nType);
-	int GetFreeBlockCountForType(int nType);
+	int GetTotalBlockCountAtBound(int nType);
+	int GetFreeBlockCountAtBound(int nType);
 
+	// how many kinds of block size
 	int GetBlockTypeCount();
 
-	void DunpMemoryPool();
+	void DumpMemoryPool();
 
-	int FindType(int nElement);
+	// adjust nSize to allocate boundary (16B, 32B ...)
+	// return -1 means user allocate boundary
+	int UpSize2Boundary(int nSize);
 
-	template<class T>
-	T* New();
+	// get type by allocate boundary . nBlockBound [16B 32B ... 4MB] type [0,Allocator_Idx_Max) 
+	// return -1 means user allocate boundary
+	int BlockBound2Slot(int nBlockBound);
 
-	template<class T>
-	void Delete(T* pObj);
+	// get allocate boundary by type. nType [0,Allocator_Idx_Max) bound [16B,1MB]
+	// return -1 means user allocate boundary
+	int Slot2BlockBound(int nType);
+
 private:
 	MemoryPool(){};
 
 	DECLARE_SINGLETON_CLASS(MemoryPool)
-protected:
-	int FitSize(int nSize);
-
-	int FindElement(int nType);
 
 private:
-	static const int			MemTypeMax = 17;
-
-	MemTypeAllocator*			m_arrayAllocator[MemTypeMax]; 
-
-	CRITICAL_SECTION			m_cs;
+	// allocator for each block size
+	MemTypeAllocator*  m_arrayAllocator[Allocator_Idx_Max];
+	CRITICAL_SECTION   m_cs;
 };
 /************************************************************************
 * Function : NA
@@ -271,14 +304,37 @@ private:
 * Output   : 
 * Info     : 2014/04/03
 ************************************************************************/
-inline int MemoryPool::FindElement(int nType)
+inline int MemoryPool::UpSize2Boundary(int nSize)
 {
-	int nRet = -1;
+	assert(0 != nSize);
 
-	if (nType > 0 && nType <= Mem_1m_Bit_Size)
+	int nRet = Mem_User_Byte_Size_Type;
+	if ( 0 < nSize && nSize < Mem_Min_Byte_Size_Type )
 	{
-		nRet = (int)(log10(nType*1.0)/log10(2.0) - 4);
+		nRet = Mem_Min_Byte_Size_Type;
 	}
+	else if (nSize <= Mem_Max_Byte_Size_Type) 
+	{
+		// nSize is some boundary just return
+		if ( 0 == (nSize & (nSize-1)) )
+		{
+			nRet = nSize;
+		}
+		else
+		{
+			// div 16
+			nSize = nSize >> Mem_Block_Base;
+
+			// find the highest bit
+			int nHighBit = 0;
+			while ( nSize && (nSize >>= 1) )
+				++nHighBit;
+
+			// left shift the highest bit, nRet is double nSize
+			nRet = 1 << (Mem_Block_Base+nHighBit+1);
+		}
+	}
+
 	return nRet;
 }
 /************************************************************************
@@ -288,16 +344,37 @@ inline int MemoryPool::FindElement(int nType)
 * Output   : 
 * Info     : 2014/04/03
 ************************************************************************/
-inline int MemoryPool::FindType(int nElement)
+inline int MemoryPool::BlockBound2Slot(int nBlockBound)
 {
-	int nRet = -1;
-
-	if (nElement >= 0 && nElement < MemTypeMax)
+	int nRet = Allocator_Idx_Invalid;
+	if (0 < nBlockBound && nBlockBound <= Mem_Max_Byte_Size_Type)
 	{
-		nRet = (int)pow(2.0,nElement + 4);
+		nBlockBound = nBlockBound >> Mem_Block_Base;
+		nRet = 0;
+		while ( nBlockBound && (nBlockBound >>= 1) )
+			++nRet;
+	}
+
+	return nRet;
+}
+/************************************************************************
+* Function : NA
+* Author   : xihu
+* Input    : 
+* Output   : 
+* Info     : 2014/04/03
+************************************************************************/
+inline int MemoryPool::Slot2BlockBound(int nIdx)
+{
+	int nRet = Mem_User_Byte_Size_Type;
+
+	if (nIdx >= Allocator_Idx_0 && nIdx < Allocator_Idx_Max)
+	{
+		nRet = 1 << (nIdx + Mem_Block_Base);
 	}
 	return nRet;
 }
+
 /************************************************************************
 * Function : NA
 * Author   : xihu
@@ -309,10 +386,9 @@ inline void MemoryPool::InitMemoryPool()
 {
 	InitializeCriticalSection(&m_cs);
 
-	for (int i = 0;i < MemTypeMax;i++)
+	for (int i = 0;i < Allocator_Idx_Max; ++i)
 	{
-		int nType = FindType(i);
-
+		int nType = Slot2BlockBound(i);
 		m_arrayAllocator[i] = new MemTypeAllocator(nType);
 	}
 }
@@ -327,7 +403,7 @@ inline void MemoryPool::UnInitMemoryPool()
 {
 	DeleteCriticalSection(&m_cs);
 
-	for (int i = 0;i < MemTypeMax;i++)
+	for (int i = 0;i < Allocator_Idx_Max; ++i)
 	{
 		delete m_arrayAllocator[i];
 
@@ -342,107 +418,15 @@ inline void MemoryPool::UnInitMemoryPool()
 * Output   : 
 * Info     : 2014/04/03
 ************************************************************************/
-inline int MemoryPool::FitSize(int nSize)
-{
-	int nRet = -1;
-
-	if (nSize <= 0)
-	{
-		return nRet;
-	}
-	else if (nSize >0 && nSize <= Mem_16_Bit_Size)
-	{ 
-		nRet = Mem_16_Bit_Size;
-	}
-	else if (nSize <= Mem_32_Bit_Size) 
-	{ 
-		nRet = Mem_32_Bit_Size;
-	}
-	else if (nSize <= Mem_64_Bit_Size) 
-	{ 
-		nRet = Mem_64_Bit_Size; 
-	}
-	else if (nSize <= Mem_128_Bit_Size) 
-	{ 
-		nRet = Mem_128_Bit_Size; 
-	}
-	else if (nSize <= Mem_256_Bit_Size) 
-	{ 
-		nRet = Mem_256_Bit_Size; 
-	}
-	else if (nSize <= Mem_512_Bit_Size) 
-	{ 
-		nRet = Mem_512_Bit_Size; 
-	}
-	else if (nSize <= Mem_1k_Bit_Size) 
-	{ 
-		nRet = Mem_1k_Bit_Size; 
-	}
-	else if (nSize <= Mem_2k_Bit_Size) 
-	{ 
-		nRet = Mem_2k_Bit_Size; 
-	} 
-	else if (nSize <= Mem_4k_Bit_Size) 
-	{ 
-		nRet = Mem_4k_Bit_Size; 
-	} 
-	else if (nSize <= Mem_8k_Bit_Size) 
-	{ 
-		nRet = Mem_8k_Bit_Size; 
-	} 
-	else if (nSize <= Mem_16k_Bit_Size) 
-	{  
-		nRet = Mem_16k_Bit_Size;
-	} 
-	else if (nSize <= Mem_32k_Bit_Size)
-	{  
-		nRet = Mem_32k_Bit_Size;
-	} 
-	else if (nSize <= Mem_64k_Bit_Size)
-	{  
-		nRet = Mem_64k_Bit_Size;
-	} 
-	else if (nSize <= Mem_128k_Bit_Size)
-	{  
-		nRet = Mem_128k_Bit_Size;
-	} 
-	else if (nSize <= Mem_256k_Bit_Size)
-	{  
-		nRet = Mem_256k_Bit_Size;
-	} 
-	else if (nSize <= Mem_512k_Bit_Size) 
-	{ 
-		nRet = Mem_512k_Bit_Size; 
-	} 
-	else if (nSize <= Mem_1m_Bit_Size) 
-	{ 
-		nRet = Mem_1m_Bit_Size;
-	} 
-	else
-	{  
-		//如果申请大于1M的内存直接申请
-		//....
-	}
-	return nRet;
-}
-/************************************************************************
-* Function : NA
-* Author   : xihu
-* Input    : 
-* Output   : 
-* Info     : 2014/04/03
-************************************************************************/
 inline void* MemoryPool::Malloc(int nSize)
 {
 	void* pRet = NULL;
 
-	int nType = FitSize(nSize);
-
-	if (nType > 0)
+	int nBlockBoundary = UpSize2Boundary(nSize);
+	if ( nBlockBoundary > 0 )
 	{
-		int nElement = FindElement(nType);
-
-		if (nElement >= 0)
+		int nElement = BlockBound2Slot(nBlockBoundary);
+		if (nElement > 0)
 		{
 			EnterCriticalSection(&m_cs);
 
@@ -455,19 +439,15 @@ inline void* MemoryPool::Malloc(int nSize)
 			assert(0);
 		}
 	}
-	else if (nType = 0)
-	{
-		return pRet;
-	}
 	else
 	{
-		void* pTond = malloc(nSize + sizeof(MemBlock));
+		void* pAllocated = malloc(nSize + sizeof(MemBlock));
+		assert(pAllocated != NULL);
 
-		assert(pTond != NULL);
+		MemBlock* pMemBlock = (MemBlock*)pAllocated;
+		pMemBlock->m_nBlockSizeType = Mem_User_Byte_Size_Type;
 
-		*(int*)pTond = -1;	//自行分配内存
-
-		pRet = (char*)pTond + sizeof(MemBlock);
+		pRet = (char*)pAllocated + sizeof(MemBlock);
 	}
 	return pRet;
 }
@@ -484,12 +464,10 @@ inline void MemoryPool::Free(void* pMemory)
 	{
 		return;
 	}
-	int* pType = (int*)((char*)pMemory - sizeof(MemBlock));
+	MemBlock* pMemBlock = (MemBlock*)((char*)pMemory - sizeof(MemBlock));
+	int nType = pMemBlock->m_nBlockSizeType;
 
-	assert(pType != NULL);
-
-	int nElement = FindElement(*pType);
-
+	int nElement = BlockBound2Slot(nType);
 	if (nElement >= 0)
 	{
 		EnterCriticalSection(&m_cs);
@@ -517,9 +495,9 @@ inline long MemoryPool::GetTotalMemorySize()
 {
 	long lRet = -1;
 
-	for (int i = 0;i < MemTypeMax;i++)
+	for (int i = 0;i < Allocator_Idx_Max; ++i)
 	{
-		lRet += m_arrayAllocator[i]->GetTotalBlockCount()*m_arrayAllocator[i]->GetBlockType();
+		lRet += m_arrayAllocator[i]->GetTotalBlockCount()*m_arrayAllocator[i]->GetBlockBound();
 	}
 	return lRet;
 }
@@ -534,9 +512,9 @@ inline long MemoryPool::GetFreeMemorySize()
 {
 	long lRet = -1;
 
-	for (int i = 0;i < MemTypeMax;i++)
+	for (int i = 0;i < Allocator_Idx_Max; ++i)
 	{
-		lRet += m_arrayAllocator[i]->GetFreeBlockCount()*m_arrayAllocator[i]->GetBlockType();
+		lRet += m_arrayAllocator[i]->GetFreeBlockCount()*m_arrayAllocator[i]->GetBlockBound();
 	}
 	return lRet;
 }
@@ -547,19 +525,14 @@ inline long MemoryPool::GetFreeMemorySize()
 * Output   : 
 * Info     : 2014/04/03
 ************************************************************************/
-inline int MemoryPool::GetTotalBlockCountForType(int nType)
+inline int MemoryPool::GetTotalBlockCountAtBound(int nBlockBound)
 {
 	int nRet = -1;
 
-	int nElement = FindElement(nType);
-
+	int nElement = BlockBound2Slot(nBlockBound);
 	if (nElement >= 0)
 	{
 		nRet = m_arrayAllocator[nElement]->GetTotalBlockCount();
-	}
-	else
-	{
-		nRet = 0;
 	}
 	return nRet;
 }
@@ -570,19 +543,14 @@ inline int MemoryPool::GetTotalBlockCountForType(int nType)
 * Output   : 
 * Info     : 2014/04/03
 ************************************************************************/
-inline int MemoryPool::GetFreeBlockCountForType(int nType)
+inline int MemoryPool::GetFreeBlockCountAtBound(int nBlockBound)
 {
 	int nRet = -1;
-	
-	int nElement = FindElement(nType);
 
+	int nElement = BlockBound2Slot(nBlockBound);
 	if (nElement >= 0)
 	{
 		nRet = m_arrayAllocator[nElement]->GetFreeBlockCount();
-	}
-	else
-	{
-		nRet = 0;
 	}
 	return nRet;
 }
@@ -595,11 +563,7 @@ inline int MemoryPool::GetFreeBlockCountForType(int nType)
 ************************************************************************/
 inline int MemoryPool::GetBlockTypeCount()
 {
-	int nRet = -1;
-
-	nRet = MemTypeMax;
-
-	return nRet;
+	return Allocator_Idx_Max;
 }
 /************************************************************************
 * Function : NA
@@ -608,9 +572,9 @@ inline int MemoryPool::GetBlockTypeCount()
 * Output   : 
 * Info     : 2014/04/03
 ************************************************************************/
-inline void MemoryPool::DunpMemoryPool()
+inline void MemoryPool::DumpMemoryPool()
 {
-	for (int i = 0;i < MemTypeMax;i++)
+	for (int i = 0;i < Allocator_Idx_Max; ++i)
 	{
 		if (m_arrayAllocator[i]->GetTotalBlockCount() > 0)
 		{
