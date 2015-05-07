@@ -192,7 +192,7 @@ int IocpDriver::Connect(SOCKET& sConn,int nPort,char* pIp)
 
 		if (0 != WSARecv(pAsyncResult->m_sDealSocket,&wsabuf,1,NULL,&dwFlag,pAsyncResult,NULL) && WSAGetLastError() != WSA_IO_PENDING)
 		{
-			TRACE("WSARecv Error : %d\n",WSAGetLastError());
+			TRACE("Connect WSARecv Error : %d\n",WSAGetLastError());
 
 			if (WSAGetLastError() != 997)
 			{
@@ -211,9 +211,12 @@ int IocpDriver::Connect(SOCKET& sConn,int nPort,char* pIp)
 
 				if (!bRet)
 				{
-					m_pMemoryPool->Free(pAsyncResult);
+					if (GetLastError() != 997)
+					{
+						m_pMemoryPool->Free(pAsyncResult);
 
-					pAsyncResult = NULL;
+						pAsyncResult = NULL;
+					}
 				}
 			}
 		}
@@ -409,7 +412,7 @@ int IocpDriver::DealIoImpl()
 				}
 				nRet = CancelIo((HANDLE)pAsyncResult->m_sDealSocket);
 
-				PostAcceptIo(pAsyncResult);
+				//PostAcceptIo(pAsyncResult);
 			}
 
 			//TRACE("m_Iocp.GetStatus UseTime : %d\n",GetTickCount() - nTick);
@@ -439,23 +442,20 @@ int IocpDriver::DealIoImpl()
 
 					bRet = DisconnectEx(pAsyncResult->m_sDealSocket,NULL,dwFlags,0);
 
-					if (bRet)
+					if (!bRet)
 					{
-						PostIoMsg(pAsyncResult->m_sListen,pAsyncResult->m_sDealSocket,IO_ON_DISCONN,NULL,0);
+						if (GetLastError() != 997)
+						{
+							m_pMemoryPool->Free(pAsyncResult);
 
-						PostAcceptIo(pAsyncResult);
-					}
-					else
-					{
-						TRACE("bRet = DisconnectEx == TRUE\n");
-
-						m_pMemoryPool->Free(pAsyncResult);
-
-						pAsyncResult = NULL;
+							pAsyncResult = NULL;
+						}
 					}
 				}
 				else
 				{
+					TRACE("GetStatus = FALSE,GetLastError = %d,pAsyncResult = %p \n",nErr,pAsyncResult);
+
 					if (pAsyncResult->m_pCallBackFunc != NULL)
 					{
 						(this->*(pAsyncResult->m_pCallBackFunc))(pAsyncResult,0);
@@ -552,7 +552,7 @@ int IocpDriver::OnAccept(AsyncResult* pAsyncResult,int nNumBytes)
 
 	if (0 != WSARecv(pAsyncResult->m_sDealSocket,&wsabuf,1,NULL,&dwFlag,pAsyncResult,NULL) && WSAGetLastError() != WSA_IO_PENDING)
 	{
-		TRACE("WSARecv Error : %d\n",WSAGetLastError());
+		TRACE("OnAccept WSARecv Error : %d\n",WSAGetLastError());
 
 		if (WSAGetLastError() != 997)
 		{
@@ -571,9 +571,12 @@ int IocpDriver::OnAccept(AsyncResult* pAsyncResult,int nNumBytes)
 
 			if (!bRet)
 			{
-				m_pMemoryPool->Free(pAsyncResult);
-			
-				pAsyncResult = NULL;
+				if (GetLastError() != 997)
+				{
+					m_pMemoryPool->Free(pAsyncResult);
+
+					pAsyncResult = NULL;
+				}
 			}
 		}
 		return nRet;
@@ -623,7 +626,7 @@ int IocpDriver::OnPreRecv(AsyncResult* pAsyncResult,int nNumBytes)
 
 	if (0 != WSARecv(pAsyncResult->m_sDealSocket,&wsabuf,1,NULL,&dwFlag,pAsyncResult,NULL) && WSAGetLastError() != WSA_IO_PENDING)
 	{
-		TRACE("WSARecv Error : %d\n",WSAGetLastError());
+		TRACE("OnPreRecv WSARecv Error : %d\n",WSAGetLastError());
 
 		if (WSAGetLastError() != 997)
 		{
@@ -642,9 +645,12 @@ int IocpDriver::OnPreRecv(AsyncResult* pAsyncResult,int nNumBytes)
 
 			if (!bRet)
 			{
-				m_pMemoryPool->Free(pAsyncResult);
+				if (GetLastError() != 997)
+				{
+					m_pMemoryPool->Free(pAsyncResult);
 
-				pAsyncResult = NULL;
+					pAsyncResult = NULL;
+				}
 			}
 		}
 	}
@@ -683,9 +689,12 @@ int IocpDriver::OnRecv(AsyncResult* pAsyncResult,int nNumBytes)
 
 		if (!bRet)
 		{
-			PostIoMsg(pAsyncResult->m_sListen,pAsyncResult->m_sDealSocket,IO_ON_DISCONN,NULL,0);
+			if (GetLastError() != 997)
+			{
+				m_pMemoryPool->Free(pAsyncResult);
 
-			PostAcceptIo(pAsyncResult);
+				pAsyncResult = NULL;
+			}
 		}
 	}
 	else if (nNumBytes > 0)
@@ -702,7 +711,34 @@ int IocpDriver::OnRecv(AsyncResult* pAsyncResult,int nNumBytes)
 			}
 			WORD wLen = *(WORD*)pRecvBuf;
 
-			assert(wLen > 0 && wLen <= PACKET_MAX);
+			//assert(wLen > 0 && wLen <= PACKET_MAX);
+
+			if (wLen <= 0 && wLen > PACKET_MAX)		//非法数据
+			{
+				if (pAsyncResult->m_pBuf != NULL)
+				{
+					m_pMemoryPool->Free(pAsyncResult->m_pBuf);
+
+					pAsyncResult->m_pBuf = NULL;
+				}
+				//pMemoryPool->Free(pAsyncResult);
+				DWORD dwFlags = 1 ? TF_REUSE_SOCKET : 0;
+
+				pAsyncResult->m_pCallBackFunc = &IocpDriver::OnDisconn;
+
+				BOOL bRet = DisconnectEx(pAsyncResult->m_sDealSocket,pAsyncResult,dwFlags,0);
+
+				if (!bRet)
+				{
+					if (GetLastError() != 997)
+					{
+						m_pMemoryPool->Free(pAsyncResult);
+
+						pAsyncResult = NULL;
+					}
+				}
+				return nRet;
+			}
 
 			if (wLen > nNumBytes)
 			{
@@ -730,7 +766,7 @@ int IocpDriver::OnRecv(AsyncResult* pAsyncResult,int nNumBytes)
 
 		if (0 != WSARecv(pAsyncResult->m_sDealSocket,&wsabuf,1,NULL,&dwFlag,pAsyncResult,NULL) && WSAGetLastError() != WSA_IO_PENDING)
 		{
-			TRACE("WSARecv Error : %d\n",WSAGetLastError());
+			TRACE("OnRecv WSARecv Error : %d\n",WSAGetLastError());
 
 			if (WSAGetLastError() != 997)
 			{
@@ -749,9 +785,12 @@ int IocpDriver::OnRecv(AsyncResult* pAsyncResult,int nNumBytes)
 
 				if (!bRet)
 				{
-					m_pMemoryPool->Free(pAsyncResult);
+					if (GetLastError() != 997)
+					{
+						m_pMemoryPool->Free(pAsyncResult);
 
-					pAsyncResult = NULL;
+						pAsyncResult = NULL;
+					}
 				}
 			}
 			return nRet;
@@ -848,6 +887,8 @@ int IocpDriver::PostAcceptIo(AsyncResult* pAsyncResult)
 	if (m_nPostAcceptIoStat >= 20 && NULL != pAsyncResult)
 	{
 		closesocket(pAsyncResult->m_sDealSocket);
+
+		pAsyncResult->m_pCallBackFunc = NULL;
 
 		m_pMemoryPool->Free(pAsyncResult);
 

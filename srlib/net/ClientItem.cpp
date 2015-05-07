@@ -24,7 +24,7 @@ void ClientItem::GroupPackage(IoMsg* pIoMsg)
 
 	IMsgPacket* pPacket = (IMsgPacket*)pIoMsg->_pszBuf;
 
-	if (pPacket->msgHead.nMsgCmd == 1)
+	if (pPacket == NULL || pPacket->msgHead.nMsgCmd == 1)
 	{
 		return;
 	}
