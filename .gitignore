@@ -26,7 +26,11 @@ $RECYCLE.BIN/
 *.suo
 *.unsuccessfulbuild
 *.lastbuildstate
-
+*.user
+*.pdb
+*.ilk
+*.exe
+*.cache
 
 # Windows shortcuts
 *.lnk
